@@ -6,10 +6,12 @@ A tool for using GPT just a little quicker. A nearly truly automated footgun. Le
 
 `pip install codegpt`
 
-`Then find a file you hate (Back it up! Don't do it live!) and give it a shot.
-codegpt refactor .\helper.py "Break this up into smaller functions where you can. Add google style docstrings. Feel free to rewrite any code doesn't make sense."`
+Then find a file you hate (Back it up! Don't do it live!) and give it a shot.
+
+`codegpt refactor .\helper.py "Break this up into smaller functions where you can. Add google style docstrings. Feel free to rewrite any code doesn't make sense."`
 
 You'll see something like:
+
 ```
 This prompt is 254 tokens, are you sure you want to continue?
 The most GPT-3 can return in response is 3843. [y/N]: y
