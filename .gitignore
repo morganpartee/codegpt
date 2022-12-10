@@ -1,3 +1,5 @@
 .env
 *.explained.txt
 *.resp.json
+/dist
+/__pycache__
