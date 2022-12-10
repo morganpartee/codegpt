@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "codegpt"
 version = "0.0.2"
-license = "GNU"
+license = {file = "LICENSE.txt"}
 description = "A CLI tool for refactoring Python code using OpenAI's text-davinci-003 model"
 authors = ["John Partee"]
 repository = "https://github.com/morganpartee/codegpt"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
