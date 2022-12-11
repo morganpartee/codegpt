@@ -135,7 +135,7 @@ def generate_prompt(refactor_or_edit_instructions, code, language):
     You may not return anything outside of the json, or anything not explicitly in the schema.
     The only whitespace allowed is in the values of the entries, for the explanation and code.
     Do not return any additional whitespace, unless it is required to be valid json. No leading space.
-
+    Start right on the response line.
     RESPONSE:
     """
     )
@@ -157,7 +157,7 @@ def send_prompt_to_model(prompt, model):
     max_tokens = round(4097 - (7 / 4) * len(tokens))
 
     typer.confirm(
-        f"This prompt is {len(tokens)} tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {max_tokens}.",
+        f"This prompt is {len(tokens)}ish tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {max_tokens}ish.",
         default=True,
         abort=True,
     )
