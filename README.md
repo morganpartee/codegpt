@@ -6,6 +6,15 @@ A tool for using GPT just a little quicker. A nearly truly automated footgun. Le
 
 `pip install codegpt`
 
+And set your openapi API key as an environment variable like they recommend:
+[In their docs here](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety)
+
+Windows users can also use `setx` like:
+
+`$ setx OPENAI_SECRET_KEY=<YOUR_API_KEY>`
+
+from an admin console.
+
 Then find a file you hate (Back it up! Don't do it live!) and give it a shot.
 
 `codegpt refactor .\helper.py "Break this up into smaller functions where you can. Add google style docstrings. Feel free to rewrite any code doesn't make sense."`
