@@ -21,6 +21,16 @@ from an admin console.
 
 ## Be careful! But let's go.
 
+### Now with 10% less footgun!
+
+Try this new command to see how it works:
+
+`codegpt todo do app.py`
+
+It'll prompt you for what needs done, and give you an option to edit the todo list before we attempt to refactor it.
+
+### The rest
+
 The fun stuff is in the `unsafe` command.
 
 Find a file you hate (Back it up! Don't do it live!) and give it a shot.
