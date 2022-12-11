@@ -12,7 +12,7 @@ Then find a file you hate (Back it up! Don't do it live!) and give it a shot.
 
 You'll see something like:
 
-```
+```sh
 This prompt is 254 tokens, are you sure you want to continue?
 The most GPT-3 can return in response is 3843. [y/N]: y
 
@@ -24,9 +24,10 @@ Explanation: The code has been refactored into smaller functions to improve read
 Other things to try:
 
 - `codegpt edit` - For editing markdown files, including code blocks. Hello, blog editor!
-  <!-- - `codegpt comment` - Automatically add comments to a file. -->
+- `codegpt varnames` - Changes variable names (and supposed to only be variable names...) to be readable
+- `codegpt comment` - Automatically add comments to a file.
 
-  Propose endpoints as issues, I've got a few ideas:
+Propose endpoints as issues, I've got a few ideas:
 
 - Explain file
 - Write tests for file
