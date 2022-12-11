@@ -55,7 +55,12 @@ def refactor_or_edit(
 
     # open the file and escape the code as a code block
     with open(file_path, "r") as file:
-        code = f"```{language}\n" + file.read() + "\n```"
+        orig = file.read()
+        code = f"```{language}\n" + orig + "\n```"
+        with open(f"{file_path}.bak", 'w') as backup:
+            backup.write(orig)
+
+
 
     # specify the prompt
     prompt = generate_prompt(refactor_or_edit_instructions, code, language)
