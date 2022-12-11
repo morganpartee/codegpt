@@ -21,11 +21,19 @@ The most GPT-3 can return in response is 3843. [y/N]: y
 Explanation: The code has been refactored into smaller functions to improve readability, and Google style docstrings have been added.
 ```
 
-Propose endpoints as issues, I've got a few ideas:
+Other things to try:
+
+- `codegpt edit` - For editing markdown files, including code blocks. Hello, blog editor!
+  <!-- - `codegpt comment` - Automatically add comments to a file. -->
+
+  Propose endpoints as issues, I've got a few ideas:
 
 - Explain file
 - Write tests for file
+- Generate SQL query from table spec files
 - Generate new file
-- Generate documentation from file
+- Generate documentation from a file
 
 Just remember this is paid - 2 cents per 1k tokens is a lot when you're working on files with a few hundred lines.
+
+And remember to break up what you're working on - Results will be better with less moving parts and things to do.
