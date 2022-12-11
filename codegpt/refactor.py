@@ -2,10 +2,13 @@ import nltk
 import openai
 import os
 import typer
+import json
+from textwrap import dedent
+from pathlib import Path
 
 
 def edit_file(
-    file_path: str,
+    file_path_or_raw: str,
     refactor_or_edit_instructions: str,
     explanation_file: str = None,
     model: str = "text-davinci-003",
@@ -14,7 +17,8 @@ def edit_file(
     """Edit the given file.
 
     Args:
-        file_path (str): The path to the file to be refactored or edited.
+        file_path_or_raw (str): The path to the file to be refactored or edited, or raw text. If we can't find the file,
+        we'll treat it as raw text. Hell yeah that's lazy. If it warns you it didn't find the file, abort.
         refactor_or_edit_instructions (str): Instructions for refactoring or editing the code.
         explanation_file (str, optional): The path to the file to save the explanation. Defaults to None.
         model (str, optional): GPT-3 model to use. Defaults to "text-davinci-003".
@@ -22,58 +26,62 @@ def edit_file(
         debug (bool, optional): If True, save the response from the model in a JSON file. Defaults to False.
     """
     openai.api_key = os.getenv("OPENAI_API_KEY")
-
-    language = file_path.split(".")[-1]
+    path = Path(file_path_or_raw)
+    if not path.is_file():
+        if " " not in file_path_or_raw:
+            typer.confirm(
+                "Hmm, didn't find a file by that name, want to proceed with plaintext?",
+                abort=True,
+            )
+    language = file_path_or_raw.split(".")[-1]
 
     # open the file and escape the code as a code block
-    with open(file_path, "r") as file:
-        code = f"###{file_path}\n```{language}\n" + file.read() + "\n```"
+    with open(file_path_or_raw, "r") as file:
+        code = f"# {file_path_or_raw}\n```{language}\n" + file.read() + "\n```"
 
     # specify the prompt
     prompt = generate_prompt(refactor_or_edit_instructions, code, language)
-    tokens = nltk.word_tokenize(prompt)
-
-    #! Yeah this math is BS, closeish though...
-    max_tokens = round(4097 - (7 / 4) * len(tokens))
-
-    typer.confirm(
-        f"This prompt is {len(tokens)} tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {max_tokens}.",
-        default=True,
-        abort=True,
-    )
 
     # send the prompt to the model
-    response = openai.Completion.create(
-        max_tokens=max_tokens,
-        engine=model,
-        prompt=prompt,
-        n=1,
-        stop=None,
-        temperature=0.6,
-    )
+    response = send_prompt_to_model(prompt, model)
 
     if debug:
-        import json
-
         # write the response
-        with open(file_path + ".resp.json", "w") as file:
+        with open(file_path_or_raw + ".resp.json", "w") as file:
+            response.update({"prompt": prompt})
             file.write(json.dumps(response))
 
     # print the response from the model
-    refactored_code = response["choices"][0]["text"]
+    try:
+        resp = json.loads(response["choices"][0]["text"])
+    except json.JSONDecodeError:
+        typer.secho(
+            f"Json load failed, writing fail file you can manually work with.",
+            color=typer.colors.BRIGHT_RED,
+        )
+        with open(file_path_or_raw + ".fail.json", "w") as file:
+            file.write(json.dumps(response))
 
-    explanation = refactored_code.split("===")[0]
-    refactored_code = "".join(refactored_code.split("===")[1:])
-    print(explanation)
+        typer.launch(file_path_or_raw + ".fail.json", locate=True)
+        quit()
 
+    for f in resp:
+        typer.secho(f"Writing `{f['filename']}`", fg=typer.colors.BRIGHT_CYAN)
+        refactor_and_explain_code(
+            f["filename"], f["code"], f["explanation"], explanation_file
+        )
+        typer.secho(f["explanation"], fg=typer.colors.BRIGHT_GREEN)
+
+
+def refactor_and_explain_code(
+    file_path, refactored_code, explanation, explanation_file=None
+):
     old_file_path = file_path + ".old"
     os.rename(file_path, old_file_path)
 
-    # write the refactored code to the original file
     with open(file_path, "w") as file:
         file.write(refactored_code)
 
-    # write the refactored code to the original file
     with open(
         explanation_file if explanation_file else file_path + ".explained.txt", "w"
     ) as file:
@@ -91,11 +99,28 @@ def generate_prompt(refactor_or_edit_instructions, code, language):
     Returns:
         str: The generated prompt.
     """
-    return f"""
-    {'Refactor' if 'refactor' in refactor_or_edit_instructions.lower() else 'Edit'} the code below, to: {refactor_or_edit_instructions}
+    return dedent(
+        f"""
+    {'Refactor' if 'refactor' in refactor_or_edit_instructions.lower() else 'Edit'} the code below, to:
+    
+    {refactor_or_edit_instructions}
 
-    Write a short summary of the changes made to the code and return the edited code in a new section,
-    delimited by '==='. Don't use '===' other than between the sections, and don't add space between sections.
+    Your response must be json in this (simplified) schema, with one object in the array for each file you output:
+
+    ```json
+    [
+        {{
+        "explanation": <explanation: string>,
+        "filename": <filename: string>,
+        "code": <code: string>
+        }}
+    ]
+    ```
+
+    For the `explanation`, explain exactly what you did to the provided code. Make sure to include line numbers. Keep it very succinct, in a bullet list.
+
+    You must return an explanation, even if you do nothing.
+
 
     You are an expert, ensure that code is technically correct, well documented and formatted.
     {"Use google docstrings and black formatting."if language == "py" else ""}
@@ -104,4 +129,44 @@ def generate_prompt(refactor_or_edit_instructions, code, language):
     You must explain what you did, even if you don't make a change.
 
     Code:
-    {code}""".strip()
+    {code}
+    
+    ONLY return valid json in the schema outlined in the instructions, so it may be loaded by python's json.loads.
+    You may not return anything outside of the json, or anything not explicitly in the schema.
+    The only whitespace allowed is in the values of the entries, for the explanation and code.
+    Do not return any additional whitespace, unless it is required to be valid json. No leading space.
+
+    RESPONSE:
+    """
+    )
+
+
+def send_prompt_to_model(prompt, model):
+    """Send the given prompt to the given model.
+
+    Args:
+        prompt (str): The prompt to be sent to the model.
+        model (str): GPT-3 model to use.
+
+    Returns:
+        dict: The response from the model.
+    """
+    tokens = nltk.word_tokenize(prompt)
+
+    #! Yeah this math is BS, closeish though...
+    max_tokens = round(4097 - (7 / 4) * len(tokens))
+
+    typer.confirm(
+        f"This prompt is {len(tokens)} tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {max_tokens}.",
+        default=True,
+        abort=True,
+    )
+
+    return openai.Completion.create(
+        max_tokens=max_tokens,
+        engine=model,
+        prompt=prompt,
+        n=1,
+        stop=None,
+        temperature=0.6,
+    )
