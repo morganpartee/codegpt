@@ -123,8 +123,6 @@ def configure():
 
     If the OPENAI_SECRET_KEY is already set in the environment variables, this command will not do anything.
     Otherwise, it will prompt the user for the secret key and create a .env file with the secret key.
-
-    :param output_path: The path to the output dotenv file (default: .env).
     """
     # check if the secret key is already set in the environment variables
     if "OPENAI_SECRET_KEY" in os.environ:

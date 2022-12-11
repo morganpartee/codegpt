@@ -1,8 +1,6 @@
 import os
 import typer
-
-import unsafe
-import todos
+from commands import unsafe, todos
 
 app = typer.Typer()
 

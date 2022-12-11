@@ -134,6 +134,8 @@ def generate_prompt(refactor_or_edit_instructions, code, language):
 
     You must explain what you did, even if you don't make a change.
 
+    If you're provided a todo list, return that too. Put an X in each box if you could do the task, but leave it empty if you couldn't. Explain why you couldn't! Whitespace is fine in explanations.
+
     Code:
     {code}
     
@@ -151,15 +153,18 @@ def send_prompt_to_model(prompt, model):
     Returns:
         dict: The response from the model.
     """
-    prompt += dedent(
-        """ONLY return valid json in the schema outlined in the instructions, so it may be loaded by python's json.loads.
+    prompt += (
+        "\n\n"
+        + dedent(
+            """ONLY return valid json in the schema outlined in the instructions, so it may be loaded by python's json.loads.
     You may not return anything outside of the json, or anything not explicitly in the schema.
     The only whitespace allowed is in the values of the entries, for the explanation and code.
     Do not return any additional whitespace, unless it is required to be valid json. No leading space.
-    Start right on the response line.
+    Start right on the response line. Do not escape your response, or put it in a code block. Just raw JSON.
     RESPONSE:
     """
-    ).strip()
+        ).strip()
+    )
 
     tokens = nltk.word_tokenize(prompt)
 

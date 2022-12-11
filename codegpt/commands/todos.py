@@ -1,18 +1,11 @@
 from pathlib import Path
 import json
 import typer
-import openai
-import os
-from refactor import edit_file, send_prompt_to_model
+
+from commands.refactor import edit_file, send_prompt_to_model
 from textwrap import dedent
 
 app = typer.Typer()
-
-
-def send_prompt_to_model(prompt, model):
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-    response = openai.Completion.create(engine=model, prompt=prompt)
-    return response
 
 
 @app.command("do")

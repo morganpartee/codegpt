@@ -1,7 +1,7 @@
 import typer
 from textwrap import dedent
 
-from refactor import edit_file
+from commands.refactor import edit_file
 
 
 app = typer.Typer()
@@ -28,10 +28,11 @@ def comment(
 ):
     if not refactor_instructions:
         refactor_instructions = dedent(
-            """Add comments where helpful, but make no code changes
+            """Add helpful explanatory comments, but make no code changes otherwise.
     If you think you see a bug, say so in a comment starting with `BUG: `
     Keep them succinct, but explain everything you can if it's helpful.
     Add function or class string comments where you can figure out what a function does.
+    If the language has a "docstring" standard, use it too.
     If you're unsure, note it in the explanation, and leave a placeholder comment with
     as much as you can figure out to make it easier for a user to do."""
         )
