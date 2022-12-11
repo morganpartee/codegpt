@@ -93,8 +93,8 @@ def refactor_or_edit(
     # print the response from the model
     refactored_code = response["choices"][0]["text"]
 
-    explanation = refactored_code.split("")[0]
-    refactored_code = "".join(refactored_code.split("")[1:])
+    explanation = refactored_code.split("===")[0]
+    refactored_code = "".join(refactored_code.split("===")[1:])
     print(explanation)
 
     old_file_path = file_path + ".old"
