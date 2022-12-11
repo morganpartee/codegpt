@@ -13,6 +13,7 @@ def edit_file(
     explanation_file: str = None,
     model: str = "text-davinci-003",
     debug: bool = False,
+    raw: bool = False,
 ):
     """Edit the given file.
 
@@ -74,10 +75,15 @@ def edit_file(
 
 
 def refactor_and_explain_code(
-    file_path, refactored_code, explanation, explanation_file=None
+    file_path,
+    refactored_code,
+    explanation,
+    explanation_file=None,
+    raw_text: bool = None,
 ):
-    old_file_path = file_path + ".old"
-    os.rename(file_path, old_file_path)
+    if not raw_text:
+        old_file_path = file_path + ".old"
+        os.rename(file_path, old_file_path)
 
     with open(file_path, "w") as file:
         file.write(refactored_code)
@@ -131,13 +137,7 @@ def generate_prompt(refactor_or_edit_instructions, code, language):
     Code:
     {code}
     
-    ONLY return valid json in the schema outlined in the instructions, so it may be loaded by python's json.loads.
-    You may not return anything outside of the json, or anything not explicitly in the schema.
-    The only whitespace allowed is in the values of the entries, for the explanation and code.
-    Do not return any additional whitespace, unless it is required to be valid json. No leading space.
-    Start right on the response line.
-    RESPONSE:
-    """
+"""
     )
 
 
@@ -151,6 +151,16 @@ def send_prompt_to_model(prompt, model):
     Returns:
         dict: The response from the model.
     """
+    prompt += dedent(
+        """ONLY return valid json in the schema outlined in the instructions, so it may be loaded by python's json.loads.
+    You may not return anything outside of the json, or anything not explicitly in the schema.
+    The only whitespace allowed is in the values of the entries, for the explanation and code.
+    Do not return any additional whitespace, unless it is required to be valid json. No leading space.
+    Start right on the response line.
+    RESPONSE:
+    """
+    ).strip()
+
     tokens = nltk.word_tokenize(prompt)
 
     #! Yeah this math is BS, closeish though...
