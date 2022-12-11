@@ -2,6 +2,10 @@
 
 A tool for using GPT just a little quicker. A nearly truly automated footgun. Learn how to revert with git before trying please.
 
+Posting about progress here:
+
+[![Twitter Follow](https://img.shields.io/twitter/follow/_JohnPartee?style=social)](https://twitter.com/_JohnPartee)
+
 # Getting Started
 
 `pip install codegpt`
@@ -15,9 +19,13 @@ Windows users can also use `setx` like:
 
 from an admin console.
 
-Then find a file you hate (Back it up! Don't do it live!) and give it a shot.
+## Be careful! But let's go.
 
-`codegpt refactor .\helper.py "Break this up into smaller functions where you can. Add google style docstrings. Feel free to rewrite any code doesn't make sense."`
+The fun stuff is in the `unsafe` command.
+
+Find a file you hate (Back it up! Don't do it live!) and give it a shot.
+
+`codegpt unsafe edit .\helper.py "Break this up into smaller functions where you can. Add google style docstrings. Feel free to rewrite any code doesn't make sense."`
 
 You'll see something like:
 
@@ -32,9 +40,9 @@ Explanation: The code has been refactored into smaller functions to improve read
 
 Other things to try:
 
-- `codegpt edit` - For editing markdown files, including code blocks. Hello, blog editor!
-- `codegpt varnames` - Changes variable names (and supposed to only be variable names...) to be readable
-- `codegpt comment` - Automatically add comments to a file.
+- `codegpt unsafe edit` - Try it with anything. Markdown blog posts, js, yaml, python, whatever.
+- `codegpt unsafe varnames` - Changes variable names (and supposed to only be variable names...) to be readable
+- `codegpt unsafe comment` - Automatically add comments to a file.
 
 Propose endpoints as issues, I've got a few ideas:
 
