@@ -18,21 +18,18 @@ def generate_prompt(refactor_or_edit_instructions, code, language):
         str: The generated prompt.
     """
     return f"""
+    {'Refactor' if 'refactor' in refactor_or_edit_instructions.lower() else 'Edit'} the following {language} code: {refactor_or_edit_instructions}
+
     Please provide an extremely succinct human explanation of the changes made to the code
     and return the edited code in a new section, delimited by '==='. Don't use '===' other than
     between the sections (don't remove it if it's present though!), and don't add space between sections.
-    
-    Take liberties to fix technical problems if you find them, but make sure to explain it clearly in comments
-    (sign your changes `codegpt` in a comment) and the explanation section, and include line numbers in the
-    explanation section if you do.
-    
+
     Ensure that code is well documented and formatted.
     {" Use google docstrings and black formatting."if language == "python" else ""}
-    
-    {'Refactor' if 'refactor' in refactor_or_edit_instructions.lower() else 'Edit'} the following {language} code: {refactor_or_edit_instructions}
 
     You must explain what you did, even if you don't make a change.
 
+    Code:
     {code}""".strip()
 
 
@@ -120,6 +117,16 @@ def refactor(
     language: str = "python",
     debug: bool = False,
 ):
+    """Refactor the given file according to the given instructions.
+
+    Args:
+        file_path (str): The path to the file to be refactored.
+        refactor_instructions (str): Instructions for refactoring the code.
+        explanation_file (str, optional): The path to the file to save the explanation. Defaults to None.
+        model (str, optional): GPT-3 model to use. Defaults to "text-davinci-003".
+        language (str, optional): The language of the code. Defaults to "python".
+        debug (bool, optional): If True, save the response from the model in a JSON file. Defaults to False.
+    """
     refactor_or_edit(
         file_path, refactor_instructions, explanation_file, model, language, debug
     )
@@ -134,6 +141,16 @@ def varnames(
     language: str = "python",
     debug: bool = False,
 ):
+    """Refactor the given file to rename variables as appropriate.
+
+    Args:
+        file_path (str): The path to the file to be refactored.
+        refactor_instructions (str): Instructions for refactoring the code.
+        explanation_file (str, optional): The path to the file to save the explanation. Defaults to None.
+        model (str, optional): GPT-3 model to use. Defaults to "text-davinci-003".
+        language (str, optional): The language of the code. Defaults to "python".
+        debug (bool, optional): If True, save the response from the model in a JSON file. Defaults to False.
+    """
     refactor_or_edit(
         file_path, refactor_instructions, explanation_file, model, language, debug
     )
@@ -148,6 +165,7 @@ def comment(
     language: str = "python",
     debug: bool = False,
 ):
+    """Edit the given file to add comments."""
     refactor_or_edit(
         file_path, refactor_instructions, explanation_file, model, language, debug
     )
@@ -162,6 +180,7 @@ def edit(
     language: str = "md",
     debug: bool = False,
 ):
+    """A Generic edit option, meant for editing markdown blog posts. Basically refactor with some extra instructions."""
     refactor_or_edit(
         file_path, edit_instructions, explanation_file, model, language, debug
     )
@@ -171,11 +190,6 @@ def edit(
 def configure():
     """
     Configure the OpenAI secret key for the codegpt CLI.
-
-    If the OPENAI_SECRET_KEY is already set in the environment variables, this command will not do anything.
-    Otherwise, it will prompt the user for the secret key and create a .env file with the secret key.
-
-    :param output_path: The path to the output dotenv file (default: .env).
     """
     # check if the secret key is already set in the environment variables
     if "OPENAI_SECRET_KEY" in os.environ:
