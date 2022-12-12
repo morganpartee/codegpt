@@ -6,12 +6,13 @@ from os.path import dirname
 
 sys.path.append(dirname(__file__))
 
-from commands import unsafe, todos
+from commands import unsafe, todos, generate
 
 app = typer.Typer()
 
 app.add_typer(unsafe.app, name="unsafe")
 app.add_typer(todos.app, name="todo")
+app.add_typer(generate.app, name="gen")
 
 
 @app.command()

@@ -1,10 +1,11 @@
-import nltk
 import openai
 import os
 import typer
 import json
 from textwrap import dedent
 from pathlib import Path
+from .gpt_interface import send_prompt_to_model
+from .handle_input import process_file_path_or_raw
 
 
 def edit_file(
@@ -14,6 +15,7 @@ def edit_file(
     model: str = "text-davinci-003",
     debug: bool = False,
     raw: bool = False,
+    language: str = None,
 ):
     """Edit the given file.
 
@@ -27,46 +29,20 @@ def edit_file(
         debug (bool, optional): If True, save the response from the model in a JSON file. Defaults to False.
     """
     openai.api_key = os.getenv("OPENAI_API_KEY")
-    path = Path(file_path_or_raw)
-    if not path.is_file():
-        if " " not in file_path_or_raw:
-            typer.confirm(
-                "Hmm, didn't find a file by that name, want to proceed with plaintext?",
-                abort=True,
-            )
-    language = file_path_or_raw.split(".")[-1]
 
-    # open the file and escape the code as a code block
-    with open(file_path_or_raw, "r") as file:
-        code = f"# {file_path_or_raw}\n```{language}\n" + file.read() + "\n```"
+    language, file_path, raw_code = process_file_path_or_raw(
+        file_path_or_raw, language, raw
+    )
+
+    code = f"# {file_path_or_raw}\n```{language}\n{raw_code}\n```"
 
     # specify the prompt
     prompt = generate_prompt(refactor_or_edit_instructions, code, language)
 
     # send the prompt to the model
-    response = send_prompt_to_model(prompt, model)
+    response = send_prompt_to_model(prompt, model, debug, file_path)
 
-    if debug:
-        # write the response
-        with open(file_path_or_raw + ".resp.json", "w") as file:
-            response.update({"prompt": prompt})
-            file.write(json.dumps(response))
-
-    # print the response from the model
-    try:
-        resp = json.loads(response["choices"][0]["text"])
-    except json.JSONDecodeError:
-        typer.secho(
-            f"Json load failed, writing fail file you can manually work with.",
-            color=typer.colors.BRIGHT_RED,
-        )
-        with open(file_path_or_raw + ".fail.json", "w") as file:
-            file.write(json.dumps(response))
-
-        typer.launch(file_path_or_raw + ".fail.json", locate=True)
-        quit()
-
-    for f in resp:
+    for f in response:
         typer.secho(f"Writing `{f['filename']}`", fg=typer.colors.BRIGHT_CYAN)
         refactor_and_explain_code(
             f["filename"], f["code"], f["explanation"], explanation_file
@@ -123,10 +99,11 @@ def generate_prompt(refactor_or_edit_instructions, code, language):
     ]
     ```
 
-    For the `explanation`, explain exactly what you did to the provided code. Make sure to include line numbers. Keep it very succinct, in a bullet list.
+    For the `explanation`, explain exactly what you did to the provided code. You must include line numbers when you make changes.
+    
+    Write it as a succinct bullet list, line numbers first.
 
     You must return an explanation, even if you do nothing.
-
 
     You are an expert, ensure that code is technically correct, well documented and formatted.
     {"Use google docstrings and black formatting."if language == "py" else ""}
@@ -140,48 +117,4 @@ def generate_prompt(refactor_or_edit_instructions, code, language):
     {code}
     
 """
-    )
-
-
-def send_prompt_to_model(prompt, model):
-    """Send the given prompt to the given model.
-
-    Args:
-        prompt (str): The prompt to be sent to the model.
-        model (str): GPT-3 model to use.
-
-    Returns:
-        dict: The response from the model.
-    """
-    prompt += (
-        "\n\n"
-        + dedent(
-            """ONLY return valid json in the schema outlined in the instructions, so it may be loaded by python's json.loads.
-    You may not return anything outside of the json, or anything not explicitly in the schema.
-    The only whitespace allowed is in the values of the entries, for the explanation and code.
-    Do not return any additional whitespace, unless it is required to be valid json. No leading space.
-    Start right on the response line. Do not escape your response, or put it in a code block. Just raw JSON.
-    RESPONSE:
-    """
-        ).strip()
-    )
-
-    tokens = nltk.word_tokenize(prompt)
-
-    #! Yeah this math is BS, closeish though...
-    max_tokens = round(4097 - (7 / 4) * len(tokens))
-
-    typer.confirm(
-        f"This prompt is {len(tokens)}ish tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {max_tokens}ish.",
-        default=True,
-        abort=True,
-    )
-
-    return openai.Completion.create(
-        max_tokens=max_tokens,
-        engine=model,
-        prompt=prompt,
-        n=1,
-        stop=None,
-        temperature=0.6,
     )

@@ -1,5 +1,6 @@
 .env
 *.explained.txt
+*.fail.json
 *.resp.json
 /dist
 **/__pycache__/**
