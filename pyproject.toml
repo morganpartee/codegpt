@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "codegpt"
-version = "0.1.2"
+version = "0.1.3"
 license = "GPL-3.0-or-later"
 description = "A CLI tool for refactoring Python code using OpenAI's text-davinci-003 model"
 authors = ["John Partee"]
@@ -21,4 +21,4 @@ requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry.scripts]
-codegpt = "codegpt.codegpt:app"
+codegpt = "codegpt.main:app"
