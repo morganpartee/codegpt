@@ -1,14 +1,16 @@
 # Codegpt
 
+## 0.1.5
+
 A tool for using GPT just a little quicker. A nearly truly automated footgun. Learn how to revert with git before trying please.
 
 Posting about progress here:
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/_JohnPartee?style=social)](https://twitter.com/_JohnPartee)
 
-# Getting Started
+## Getting Started
 
-`pip install codegpt`
+`pip install codegpt --upgrade`
 
 And set your openapi API key as an environment variable like they recommend:
 [In their docs here](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety)
@@ -19,49 +21,49 @@ Windows users can also use `setx` like:
 
 from an admin console.
 
-## Be careful! But let's go.
+## Be careful! But try this:
 
-### Now with 10% less footgun!
+Usage
+To try Codegpt, you can run the following command:
 
-Try this new command to see how it works:
-
-`codegpt todo do app.py`
-
-It'll prompt you for what needs done, and give you an option to edit the todo list before we attempt to refactor it.
-
-### The rest
-
-The fun stuff is in the `unsafe` command.
-
-Find a file you hate (Back it up! Don't do it live!) and give it a shot.
-
-`codegpt unsafe edit .\helper.py "Break this up into smaller functions where you can. Add google style docstrings. Feel free to rewrite any code doesn't make sense."`
-
-You'll see something like:
-
-```sh
-This prompt is 254 tokens, are you sure you want to continue?
-The most GPT-3 can return in response is 3843. [y/N]: y
-
-(and after a short wait...)
-
-Explanation: The code has been refactored into smaller functions to improve readability, and Google style docstrings have been added.
+```bash
+codegpt todo do <filename>
 ```
 
-Other things to try:
+This will prompt you for a description of what needs to be done and give you the option to edit the todo list before refactoring the code.
 
-- `codegpt unsafe edit` - Try it with anything. Markdown blog posts, js, yaml, python, whatever.
-- `codegpt unsafe varnames` - Changes variable names (and supposed to only be variable names...) to be readable
-- `codegpt unsafe comment` - Automatically add comments to a file.
+Or use the gen command to generate docs.
+
+```bash
+codegpt gen docs <filename>
+```
+
+For more advanced users, you can use the codegpt unsafe command, which allows you to:
+
+Change variable names
+
+```bash
+codegpt unsafe varnames <filename>
+```
+
+Add comments to your code automatically
+
+```bash
+codegpt unsafe comment <filename>
+```
+
+Edit any file
+
+```bash
+codegpt unsafe edit <filename> "Break this up into smaller functions where you can. Add google style docstrings. Feel free to rewrite any code doesn't make sense."
+```
+
+Keep in mind that using GPT-3 for code generation is paid, with a cost of 2 cents per 1,000 tokens.
+
+Just like with a Jr Dev, it's best to break up your tasks into smaller pieces to improve the results.
 
 Propose endpoints as issues, I've got a few ideas:
 
-- Explain file
 - Write tests for file
 - Generate SQL query from table spec files
 - Generate new file
-- Generate documentation from a file
-
-Just remember this is paid - 2 cents per 1k tokens is a lot when you're working on files with a few hundred lines.
-
-And remember to break up what you're working on - Results will be better with less moving parts and things to do.
