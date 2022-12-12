@@ -12,7 +12,7 @@ app = typer.Typer()
 
 
 @app.command("docs")
-def todo(
+def gendocs(
     file_path_or_raw: str,
     model: str = "text-davinci-003",
     debug: bool = False,

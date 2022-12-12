@@ -2,7 +2,11 @@ from pathlib import Path
 import json
 import typer
 
-from commands.refactor import edit_file, send_prompt_to_model
+from .handle_input import process_file_path_or_raw
+
+from commands.refactor import edit_file
+from .gpt_interface import send_prompt_to_model
+
 from textwrap import dedent
 
 app = typer.Typer()
@@ -14,28 +18,12 @@ def todo(
     model: str = "text-davinci-003",
     debug: bool = False,
     raw: bool = False,
+    do_it: bool = True,
+    language: str = None,
 ):
-    path = Path(file_path_or_raw)
-    if not path.is_file():
-        if " " not in file_path_or_raw:
-            typer.confirm(
-                "Hmm, didn't find a file by that name, want to proceed with plaintext?",
-                abort=True,
-            )
-            raw = True
-
-    language = file_path_or_raw.split(".")[-1]
-
-    if raw:
-        code = (
-            f"This was copied from a larger piece of code.\n```\n"
-            + file_path_or_raw
-            + "\n```\n"
-        )
-        file_path_or_raw = "out.txt"
-    else:
-        with open(file_path_or_raw, "r") as file:
-            code = f"# {file_path_or_raw}\n```{language}\n" + file.read() + "\n```\n"
+    language, file_path, code = process_file_path_or_raw(
+        file_path_or_raw, language, raw
+    )
 
     instructions = typer.prompt("What do you want done with this code?")
     prompt = dedent(
@@ -44,12 +32,12 @@ Generate a list of tasks that could be performed to improve the code, according 
 
 {instructions}
 
-Your response must be json in this (simplified) schema, with only one object you output:
+Your response must be json in this (simplified) schema, with only one object you return:
 
 ```json
     {{
     "filename": <filename: string>,
-    "todo": <code: string>
+    "todo": <todos: string>
     }}
 ```
 
@@ -68,40 +56,27 @@ Return the `todo` in this format:
 ## Todos
 
 [ ] - todo #1
+etc
 ...`
 
 You are an expert, ensure that your answer is technically correct, well documented and formatted.
 
-:
 {code}
-
 """
     )
 
-    response = send_prompt_to_model(prompt, model)
+    response = send_prompt_to_model(prompt, model, debug, file_path)
 
-    if debug:
-        with open(file_path_or_raw + ".resp.json", "w") as file:
-            response.update({"prompt": prompt})
-            file.write(json.dumps(response))
-
-    try:
-        todo_list = json.loads(response["choices"][0]["text"])
-    except json.JSONDecodeError:
-        typer.secho(
-            f"Json load failed, writing fail file you can manually work with.",
-            color=typer.colors.BRIGHT_RED,
-        )
-        with open(file_path_or_raw + ".fail.json", "w") as file:
-            file.write(json.dumps(response))
-        typer.launch(file_path_or_raw + ".fail.json")
-        quit()
-
-    todo_file_path = f"{todo_list['filename']}.todo"
+    todo_file_path = f"{response['filename']}.todo"
     with open(todo_file_path, "w") as file:
-        file.write(todo_list["todo"])
+        file.write(response["todo"])
 
     typer.launch(todo_file_path)
+
+    if not do_it:
+        typer.secho("done.", color=typer.colors.BRIGHT_BLUE)
+        return
+
     while True:
         with open(todo_file_path, "r") as f:
             content = f.read()
@@ -113,3 +88,13 @@ You are an expert, ensure that your answer is technically correct, well document
             break
 
     edit_file(file_path_or_raw, content, debug=debug, raw=raw)
+
+
+@app.command("list")
+def list_command(
+    file_path_or_raw: str,
+    model: str = "text-davinci-003",
+    debug: bool = False,
+    raw: bool = False,
+):
+    return todo(file_path_or_raw, model, debug, raw, do_it=False)

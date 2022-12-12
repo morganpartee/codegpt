@@ -8,11 +8,27 @@ sys.path.append(dirname(__file__))
 
 from commands import unsafe, todos, generate
 
-app = typer.Typer()
+app = typer.Typer(
+    no_args_is_help=True,
+)
 
-app.add_typer(unsafe.app, name="unsafe")
-app.add_typer(todos.app, name="todo")
-app.add_typer(generate.app, name="gen")
+app.add_typer(
+    unsafe.app,
+    name="unsafe",
+    no_args_is_help=True,
+    help="Unsafe commands - edit, varnames, comment",
+)
+
+app.add_typer(
+    todos.app,
+    name="todo",
+    no_args_is_help=True,
+    help="Todos commands - do (semi-unsafe), list",
+)
+
+app.add_typer(
+    generate.app, name="gen", no_args_is_help=True, help="Generate commands - docs"
+)
 
 
 @app.command()

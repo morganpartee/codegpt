@@ -27,10 +27,18 @@ Usage
 To try Codegpt, you can run the following command:
 
 ```bash
+codegpt todo list <filename>
+```
+
+This will prompt you for a description of what needs to be done and build a `.todo` file for the filename provided. You can ask it to do whatever, even if you aren't sure how to do it. Make sure to mention a technical requirement if you have one, like using a certain module or library. GPT-3 can be pretty lazy if you don't get specific.
+
+When you start to see good results, you can take the gloves off with:
+
+```bash
 codegpt todo do <filename>
 ```
 
-This will prompt you for a description of what needs to be done and give you the option to edit the todo list before refactoring the code.
+Which will attempt to DO the todo list with GPT3's help. Results will be mixed. Backup your code first.
 
 Or use the gen command to generate docs.
 
@@ -38,9 +46,9 @@ Or use the gen command to generate docs.
 codegpt gen docs <filename>
 ```
 
-For more advanced users, you can use the codegpt unsafe command, which allows you to:
+For more advanced (brave? foolhardy?) users, you can use the codegpt unsafe command, which allows you to:
 
-Change variable names
+Change variable names to be more readable
 
 ```bash
 codegpt unsafe varnames <filename>

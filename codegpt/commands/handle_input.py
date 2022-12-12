@@ -22,4 +22,14 @@ def process_file_path_or_raw(file_path_or_raw: str, language: str, raw: str):
         with open(file_path_or_raw, "r") as f:
             raw_code = f.read()
 
-    return language, file_path, raw_code
+    # Handle copied code and code blocking
+    if raw:
+        code = (
+            f"This was copied from a larger piece of code.\n```\n"
+            + file_path_or_raw
+            + "\n```\n"
+        )
+    else:
+        code = f"# {file_path_or_raw}\n```{language}\n{raw_code}\n```\n"
+
+    return language, file_path, code
