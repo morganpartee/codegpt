@@ -1,5 +1,10 @@
 {
     "cSpell.words": [
         "codegpt"
-    ]
+    ],
+    "python.testing.pytestArgs": [
+        "next"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }

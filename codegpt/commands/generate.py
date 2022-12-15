@@ -35,14 +35,12 @@ Generate documentation in (github style unless told otherwise) markdown format f
 
 {instructions}
 
-Your response must be json in this (simplified) schema, with one object per file you wish to output:
+Your response must be in this format:
 
-```json
-    [{{
-    "filename": <filename: string>,
-    "doc": <documentation: string>
-    }}]
-```
+filename: {{filename}}
+><code>
+filename: {{filename}}
+><code>
 
 You are an expert, ensure that your answer is technically correct, succinct, well documented and formatted.
 
