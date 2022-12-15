@@ -1,6 +1,8 @@
+"""
+Edit a file using codegpt.
+"""
 import os
 import typer
-import sys
 
 import prompts
 import gpt_interface as gpt
@@ -20,7 +22,10 @@ def edit_file(
         dir_okay=False, help="File to be edited", default=None
     ),
     backup=False,
-):
+    ):
+    """
+    Edit a file using codegpt.
+    """
     code = files.load_text(filename)
     result = gpt.send_edit(instruction, code)
     files.write_text(filename, result, backup)
@@ -31,8 +36,13 @@ def edit_file(
 def quick_edit_file(
     filename: str,
     option: prompts.PromptKeys,
+    # pylint: disable=redefined-builtin
     backup=False,
-):
+    
+    ):
+    """
+    Edit a file using codegpt's built in prompts
+    """
     code = files.load_text(filename)
     result = gpt.send_edit(prompts.prompts[option.value], code)
     files.write_text(filename, result, backup)

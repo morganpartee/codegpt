@@ -4,3 +4,4 @@
 *.resp.json
 /dist
 **/__pycache__/**
+.oai.txt

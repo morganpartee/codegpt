@@ -2,11 +2,14 @@ import nltk
 import openai
 import typer
 
-if "punkt" not in nltk.data.path:
-    typer.secho("Downloading punkt to guess token count", color=typer.colors.GREEN)
-    nltk.download("punkt", quiet=True)
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt', quiet=True)
 
-def confirm_send(prompt, max_tokens=4097):
+models = openai.Model.list()
+
+def confirm_send(prompt, max_tokens=4000):
     tokens = nltk.word_tokenize(prompt)
 
     #! Yeah this math is BS, closeish though...
@@ -56,12 +59,19 @@ def send_edit(prompt, code):
 
     max_tokens = confirm_send(prompt, 8000)
     response = openai.Edit.create(
-        engine="code-davinci-002",
-        max_tokens=max_tokens,
+        model="code-davinci-edit-001",
         input=code,
         instruction=prompt,
         n=1,
         temperature=0.7,
     )
 
-    return response["data"][0]["text"]
+    resp = response["choices"][0]["text"]
+
+    return resp
+
+if __name__ == "__main__":
+    print(send_edit("Remove usless imports", """import os
+import json
+import sys
+print("Hello, world!")"""))
