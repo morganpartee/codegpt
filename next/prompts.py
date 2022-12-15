@@ -8,7 +8,7 @@ class PromptKeys(Enum):
     VULNS = 'vulns'
 
 prompts = {
-    "comment": "Add or update comments according to the language's standards. Add function, module, and class level comments if they're appropriate.",
+    "comment": "Add or update comments according to the language's standards. Add or update function, module, or class level comments if they're appropriate.",
     "varnames": "Change variable names, but nothing else, to make the code more readable. For example, instead of using 'x' and 'y', use 'width' and 'height'.",
     "ugh": "Do anything you can to make this code more readable. Add comments, change variable and function names, add whitespace, whatever",
     "bugs": """Find any bugs you can, note them in comments prefixed with BUG:
