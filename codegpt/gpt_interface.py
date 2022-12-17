@@ -10,8 +10,6 @@ try:
 except LookupError:
     nltk.download('punkt', quiet=True)
 
-models = openai.Model.list()
-
 def confirm_send(prompt, max_tokens=4000, yes=False):
     tokens = nltk.word_tokenize(prompt)
 
