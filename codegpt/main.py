@@ -2,6 +2,8 @@ import os
 import typer
 
 from codegpt import prompts
+from codegpt.prompts import PromptKeys
+
 from codegpt import gpt_interface as gpt
 from codegpt import files
 
@@ -42,14 +44,14 @@ def edit_file(
 
 @app.command("quick")
 def quick_edit_file(
-    filename: str,
-    option: prompts.PromptKeys,
+    filenames: List[str],
+    option: PromptKeys = typer.Option(PromptKeys.COMMENT, "--option", "-o", case_sensitive=False),
     backup=False,
     ):
     """
     Edit a file using codegpt's built in prompts
     """
-    code = files.load_text(filename)
+    code = files.load_text(filenames)
     result = gpt.send_iffy_edit(prompts.prompts[option.value], code)
     files.write_text(result, backup)
     typer.secho("done", color=typer.colors.BRIGHT_BLUE)

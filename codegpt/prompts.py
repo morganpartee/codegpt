@@ -1,6 +1,6 @@
 from enum import Enum
 
-class PromptKeys(Enum):
+class PromptKeys(str, Enum):
     COMMENT = 'comment'
     VARNAMES = 'varnames'
     UGH = 'ugh'

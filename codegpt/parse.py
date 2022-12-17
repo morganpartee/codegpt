@@ -27,7 +27,10 @@ def parse_resp(response:dict):
         else:
             # Strip the leading '>' and leading/trailing whitespace from the value
             # and add it to the current key in the current dictionary
-            curr_dict[key] += line.strip().strip('> ').strip('>') + '\n'
+            if key == "code":
+                curr_dict[key] += line.strip().strip('> ').strip('>') + '\n'
+            else:
+                curr_dict[key] = line.strip().strip('> ').strip('>').strip()
 
     # Add the final dictionary to the output list
     out.append(curr_dict)

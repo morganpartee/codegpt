@@ -67,7 +67,7 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False) -
     max_tokens = confirm_send(full_prompt, yes=True)
 
     response = openai.Completion.create(
-        model="text-davinci-003",
+        engine="text-davinci-003",
         prompt=full_prompt,
         max_tokens=max_tokens,
         n=1,
