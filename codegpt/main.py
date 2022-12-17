@@ -1,9 +1,9 @@
 import os
 import typer
 
-import prompts
-import gpt_interface as gpt
-import files
+from codegpt import prompts
+from codegpt import gpt_interface as gpt
+from codegpt import files
 
 from typing import List
 from pathlib import Path
