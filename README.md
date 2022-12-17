@@ -1,6 +1,6 @@
 # Codegpt
 
-## 0.1.5
+## 0.2.0
 
 A tool for using GPT just a little quicker. A nearly truly automated footgun. Learn how to revert with git before trying please.
 
@@ -21,49 +21,53 @@ Windows users can also use `setx` like:
 
 from an admin console.
 
-## Be careful! But try this:
+## Be careful! But try this
 
 Usage
 To try Codegpt, you can run the following command:
 
 ```bash
-codegpt todo list <filename>
+codegpt do <filenames>
 ```
 
-This will prompt you for a description of what needs to be done and build a `.todo` file for the filename provided. You can ask it to do whatever, even if you aren't sure how to do it (But search to validate its plans, it might bullshit you!). Make sure to mention a technical requirement if you have one, like using a certain module or library. GPT-3 can be pretty lazy if you don't get specific.
+It will prompt you for directions to follow, and it'll do whatever you want. Write new docs, add comments to code, just make sure to ask it to "edit" or "comment" or whatever so it knows to change files or not.
 
-When you start to see good results, you can take the gloves off with:
+Or use the quick command to do some neat stuff, like:
+
+Generate docs
 
 ```bash
-codegpt todo do <filename>
+codegpt quick docs <filenames>
 ```
-
-Which will attempt to DO the todo list with GPT3's help. Results will be mixed. Backup your code first.
-
-Or use the gen command to generate docs.
-
-```bash
-codegpt gen docs <filename>
-```
-
-For more advanced (brave? foolhardy?) users, you can use the codegpt unsafe command, which allows you to:
 
 Change variable names to be more readable
 
 ```bash
-codegpt unsafe varnames <filename>
+codegpt quick varnames <filenames>
 ```
 
 Add comments to your code automatically
 
 ```bash
-codegpt unsafe comment <filename>
+codegpt quick comment <filenames>
 ```
 
-Edit any file
+Check for bugs (iffy, but worth a shot)
 
 ```bash
-codegpt unsafe edit <filename> "Break this up into smaller functions where you can. Add google style docstrings. Feel free to rewrite any code doesn't make sense."
+codegpt quick bugs <filenames>
+```
+
+Check for vulnerabilities (even more iffy, but worth a shot)
+
+```bash
+codegpt quick vulns <filenames>
+```
+
+Try to make code less miserable
+
+```bash
+codegpt quick ugh <filenames>
 ```
 
 Keep in mind that using GPT-3 for code generation is paid, with a cost of 2 cents per 1,000 tokens.

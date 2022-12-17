@@ -1,34 +1,58 @@
 import os
 import typer
-import sys
 
-from os.path import dirname
+import prompts
+import gpt_interface as gpt
+import files
 
-sys.path.append(dirname(__file__))
-
-from commands import unsafe, todos, generate
+from typing import List
+from pathlib import Path
 
 app = typer.Typer(
     no_args_is_help=True,
 )
 
-app.add_typer(
-    unsafe.app,
-    name="unsafe",
-    no_args_is_help=True,
-    help="Unsafe commands - edit, varnames, comment",
-)
+app = typer.Typer()
 
-app.add_typer(
-    todos.app,
-    name="todo",
-    no_args_is_help=True,
-    help="Todos commands - do (semi-unsafe), list",
-)
+@app.command("do")
+def edit_file(
+    filenames: List[Path] = typer.Argument(
+        None, help="List of filenames to edit. If not provided, will prompt for input.",
+    ),
+    instruction: str = typer.Option(
+        None, '--instruction', '-i', help="Instruction to edit the file(s). Keep it short!",
+    ),
+    backup: bool = typer.Option(
+        False, "--backup", "-b", help="Whether to create a backup of the original file(s).",
+    ),
+    ):
+    """
+    Edit one or more files using codegpt.
 
-app.add_typer(
-    generate.app, name="gen", no_args_is_help=True, help="Generate commands - docs"
-)
+    FILENAMES: list of filenames to edit. If not provided, will prompt for input.
+    INSTRUCTION: the instruction to edit the file(s). Keep it short!
+    """
+    if not filenames:
+        filenames = typer.prompt("Enter the filenames to edit, separated by spaces").split()
+    code = files.load_text(filenames)
+    result = gpt.send_iffy_edit(instruction, code)
+    files.write_text(result, backup)
+    typer.secho("Done!", color=typer.colors.BRIGHT_BLUE)
+
+
+@app.command("quick")
+def quick_edit_file(
+    filename: str,
+    option: prompts.PromptKeys,
+    backup=False,
+    ):
+    """
+    Edit a file using codegpt's built in prompts
+    """
+    code = files.load_text(filename)
+    result = gpt.send_iffy_edit(prompts.prompts[option.value], code)
+    files.write_text(result, backup)
+    typer.secho("done", color=typer.colors.BRIGHT_BLUE)
 
 
 @app.command()
@@ -50,8 +74,7 @@ Windows users can also use `setx` like:
 
 `$ setx OPENAI_SECRET_KEY=<YOUR_API_KEY>`
 
-from an admin console.
-        """.strip()
+from an admin console.""".strip()
         )
 
 
