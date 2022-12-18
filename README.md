@@ -1,6 +1,6 @@
 # Codegpt
 
-## 0.2.0
+## 0.2.10
 
 A tool for using GPT just a little quicker. A nearly truly automated footgun. Learn how to revert with git before trying please.
 
@@ -27,7 +27,7 @@ Usage
 To try Codegpt, you can run the following command:
 
 ```bash
-codegpt do <filenames>
+codegpt do <instructions (quoted)> <filenames>
 ```
 
 It will prompt you for directions to follow, and it'll do whatever you want. Write new docs, add comments to code, just make sure to ask it to "edit" or "comment" or whatever so it knows to change files or not.
@@ -73,9 +73,3 @@ codegpt quick ugh <filenames>
 Keep in mind that using GPT-3 for code generation is paid, with a cost of 2 cents per 1,000 tokens.
 
 Just like with a Jr Dev, it's best to break up your tasks into smaller pieces to improve the results.
-
-Propose endpoints as issues, I've got a few ideas:
-
-- Write tests for file
-- Generate SQL query from table spec files
-- Generate new file

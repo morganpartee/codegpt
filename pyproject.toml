@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "codegpt"
-version = "0.2.8"
+version = "0.2.10"
 license = "GPL-3.0-or-later"
 description = "A CLI tool for refactoring code using OpenAI's models"
 authors = ["John Partee"]

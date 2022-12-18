@@ -28,7 +28,8 @@ def edit_file(
         False, "--backup", "-b", help="Whether to create a backup of the original file(s).",
     ),
     yes: bool = typer.Option(False, "--yes", "-y", help="Don't ask for confirmation.",),
-    raw_code: str = typer.Option(None, "--raw-code", "-c", help="Raw code to edit. Overrides filenames")
+    raw_code: str = typer.Option(None, "--raw-code", "-c", help="Raw code to edit. Overrides filenames"),
+    json_out: bool = typer.Option(False, "--json-out", "-j", help="Output to raw json."),
     ):
     """
     Do something given some code for context. Asking for documents, queries, etc. should work okay. Edits are iffy, but work a lot of the time.
@@ -43,6 +44,10 @@ def edit_file(
         raise typer.BadParameter("Either FILENAMES or --raw-code (-c) must be provided.")
     code = {"code": raw_code} if raw_code else files.load_text(filenames)
     result = gpt.send_iffy_edit(instruction, code, yes=yes, clipboard=bool(raw_code))
+
+    if json_out:
+        return json.dumps(result, sort_keys=True, indent=4)
+
     files.write_text(result, backup)
     typer.secho("Done!", color=typer.colors.BRIGHT_BLUE)
 
@@ -56,7 +61,7 @@ def quick_edit_file(
     ),
     yes: bool = typer.Option(False, "--yes", "-y", help="Don't ask for confirmation.",),
     raw_code: str = typer.Option(None, "--raw-code", "-c", help="Raw code to edit. Overrides filenames"),
-    json: bool = typer.Option(False, "--json", "-j", help="Output in JSON format"),
+    json_out: bool = typer.Option(False, "--json", "-j", help="Output in JSON format"),
     ):
     """
     Edit a file using codegpt's built in prompts.
@@ -78,7 +83,7 @@ def quick_edit_file(
     code = {"code": raw_code} if raw_code else files.load_text(filenames)
     result = gpt.send_iffy_edit(prompts.prompts[option], code, yes=yes, clipboard=bool(raw_code))
 
-    if json:
+    if json_out:
         return json.dumps(result, sort_keys=True, indent=4)
 
     files.write_text(result, backup)
