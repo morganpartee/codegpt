@@ -8,6 +8,7 @@ from codegpt.parse import parse_resp
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
+    typer.secho("Downloading punkt for nltk... Only once!", fg=typer.colors.GREEN, bold=True)
     nltk.download('punkt', quiet=True)
 
 def confirm_send(prompt, max_tokens=4000, yes=False):
@@ -27,7 +28,7 @@ def confirm_send(prompt, max_tokens=4000, yes=False):
 
     return max_tokens
 
-def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False) -> str:
+def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, yes=False) -> str:
     full_prompt = "You are an expert developer. Given the following code:\n\n"
 
     for filename, code_string in code.items():
@@ -39,8 +40,10 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False) -
 
     if not clipboard:
         full_prompt += dedent("""
+        You MUST output complete files.
         
-        Answer in this exact format:
+        For each file you wish to output (only if you modified it or made a new one),
+        answer in this exact format:
         
         filename:
         > <the filename to be output>
@@ -48,10 +51,7 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False) -
         > <The changes that you made>
         code:
         > <code line 1>
-        > <code line 2...>
-        
-        You should return one entry like above for each file you want to output, separated by '==='
-        """)
+        > <code line 2...>""")
     else:
         full_prompt += dedent("""
         
@@ -64,14 +64,14 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False) -
         > <the code to be output line 2>
         > <the code to be output, line n...>""")
 
-    max_tokens = confirm_send(full_prompt, yes=True)
+    max_tokens = confirm_send(full_prompt, yes=yes)
 
     response = openai.Completion.create(
         engine="text-davinci-003",
         prompt=full_prompt,
         max_tokens=max_tokens,
         n=1,
-        temperature=0.6,
+        temperature=0.5,
     )
     
     parsed = parse_resp(response)

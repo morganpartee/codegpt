@@ -16,7 +16,7 @@ pip install codegpt
 To use the CLI, simply run the following command:
 
 ```
-codegpt <command> <options
+codegpt <command> <instruction|choice> <filenames>
 ```
 
 ## Contributing

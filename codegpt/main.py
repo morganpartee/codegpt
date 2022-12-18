@@ -2,7 +2,6 @@ import os
 import typer
 
 from codegpt import prompts
-from codegpt.prompts import PromptKeys
 
 from codegpt import gpt_interface as gpt
 from codegpt import files
@@ -18,15 +17,16 @@ app = typer.Typer()
 
 @app.command("do")
 def edit_file(
-    filenames: List[Path] = typer.Argument(
-        None, help="List of filenames to edit. If not provided, will prompt for input.",
+    instruction: str = typer.Argument(
+        ..., help="Instruction to edit the file(s). Keep it short! Wrap with quotes.",
     ),
-    instruction: str = typer.Option(
-        None, '--instruction', '-i', help="Instruction to edit the file(s). Keep it short!",
+    filenames: List[Path] = typer.Argument(
+        ..., help="List of filenames to edit. If not provided, will prompt for input.",
     ),
     backup: bool = typer.Option(
         False, "--backup", "-b", help="Whether to create a backup of the original file(s).",
     ),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Don't ask for confirmation.",),
     ):
     """
     Edit one or more files using codegpt.
@@ -37,22 +37,24 @@ def edit_file(
     if not filenames:
         filenames = typer.prompt("Enter the filenames to edit, separated by spaces").split()
     code = files.load_text(filenames)
-    result = gpt.send_iffy_edit(instruction, code)
+    result = gpt.send_iffy_edit(instruction, code, yes=yes)
     files.write_text(result, backup)
     typer.secho("Done!", color=typer.colors.BRIGHT_BLUE)
 
 
 @app.command("quick")
 def quick_edit_file(
-    filenames: List[str],
-    option: PromptKeys = typer.Option(PromptKeys.COMMENT, "--option", "-o", case_sensitive=False),
-    backup=False,
+    option: str = typer.Argument(..., help=f"{{{'|'.join(prompts.prompts.keys())}}}"),
+    filenames: List[str] = typer.Argument(..., help="Enter the filenames to edit, separated by spaces"),
+    backup: bool = typer.Option(False, '--backup', '-b', help="Whether to create a backup of the original file(s)."),
     ):
     """
     Edit a file using codegpt's built in prompts
     """
+    if option not in prompts.prompts:
+        raise typer.BadParameter(f"{option} is not a valid option. Must be one of {list(prompts.prompts.keys())}")
     code = files.load_text(filenames)
-    result = gpt.send_iffy_edit(prompts.prompts[option.value], code)
+    result = gpt.send_iffy_edit(prompts.prompts[option], code)
     files.write_text(result, backup)
     typer.secho("done", color=typer.colors.BRIGHT_BLUE)
 
