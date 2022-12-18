@@ -33,26 +33,13 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
 
     for filename, code_string in code.items():
         if not clipboard:
-            full_prompt += f"\n\nFile: {filename}\n"
-        full_prompt += f"```\n{code_string}\n```"
+            full_prompt += f"\n\nfilename:\n> {filename}\n"
+        nl = '\n'
+        full_prompt += f"code:\n{nl.join(f'> {x}' for x in code_string.splitlines())}\n\n"
 
     full_prompt += f"\n\nDo the following: {prompt}"
 
-    if not clipboard:
-        full_prompt += dedent("""
-        You MUST output complete files.
-        
-        For each file you wish to output (only if you modified it or made a new one),
-        answer in this exact format:
-        
-        filename:
-        > <the filename to be output>
-        explanation:
-        > <The changes that you made>
-        code:
-        > <code line 1>
-        > <code line 2...>""")
-    else:
+    if clipboard:
         full_prompt += dedent("""
         
         Answer in the following format:
@@ -61,8 +48,22 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
         > <The changes that you made>
         code:
         > <the code to be output line 1>
-        > <the code to be output line 2>
         > <the code to be output, line n...>""")
+
+    else:
+        full_prompt += dedent("""
+
+        You may only output complete files.
+
+        If you add or modify a file, return it in this exact format:
+
+        filename:
+        > <the filename to be output>
+        explanation:
+        > <The changes that you made>
+        code:
+        > <code line 1>
+        > <code line n...>""")
 
     max_tokens = confirm_send(full_prompt, yes=yes)
 

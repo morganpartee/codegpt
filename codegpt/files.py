@@ -12,8 +12,9 @@ def load_text(filenames):
 def write_text(files, backup=False):
     # If the backup option is specified and the file exists,
     # write the existing file to <filename>.bak
-    for out in files:
-        filename = out['filename']
+    for i, out in enumerate(files):
+        filename = out.get('filename', f"{i}.txt")
+        typer.secho(f"Hmm, didn't find a filename, writing to {filename}", color=typer.colors.MAGENTA)
         if backup and os.path.exists(filename):
             with open(filename, "r") as f_in:
                 with open(f"{filename}.bak", "w") as f_out:

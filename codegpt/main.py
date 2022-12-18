@@ -1,5 +1,6 @@
 import os
 import typer
+import json
 
 from codegpt import prompts
 
@@ -21,23 +22,27 @@ def edit_file(
         ..., help="Instruction to edit the file(s). Keep it short! Wrap with quotes.",
     ),
     filenames: List[Path] = typer.Argument(
-        ..., help="List of filenames to edit. If not provided, will prompt for input.",
+        [], help="List of filenames to edit. If not provided, will prompt for input.",
     ),
     backup: bool = typer.Option(
         False, "--backup", "-b", help="Whether to create a backup of the original file(s).",
     ),
     yes: bool = typer.Option(False, "--yes", "-y", help="Don't ask for confirmation.",),
+    raw_code: str = typer.Option(None, "--raw-code", "-c", help="Raw code to edit. Overrides filenames")
     ):
     """
-    Edit one or more files using codegpt.
+    Do something given some code for context. Asking for documents, queries, etc. should work okay. Edits are iffy, but work a lot of the time.
+    
+    Your code better be in git before you use this.
 
     FILENAMES: list of filenames to edit. If not provided, will prompt for input.
     INSTRUCTION: the instruction to edit the file(s). Keep it short!
     """
-    if not filenames:
-        filenames = typer.prompt("Enter the filenames to edit, separated by spaces").split()
-    code = files.load_text(filenames)
-    result = gpt.send_iffy_edit(instruction, code, yes=yes)
+
+    if not filenames and not raw_code:
+        raise typer.BadParameter("Either FILENAMES or --raw-code (-c) must be provided.")
+    code = {"code": raw_code} if raw_code else files.load_text(filenames)
+    result = gpt.send_iffy_edit(instruction, code, yes=yes, clipboard=bool(raw_code))
     files.write_text(result, backup)
     typer.secho("Done!", color=typer.colors.BRIGHT_BLUE)
 
@@ -46,28 +51,48 @@ def edit_file(
 def quick_edit_file(
     option: str = typer.Argument(..., help=f"{{{'|'.join(prompts.prompts.keys())}}}"),
     filenames: List[str] = typer.Argument(..., help="Enter the filenames to edit, separated by spaces"),
-    backup: bool = typer.Option(False, '--backup', '-b', help="Whether to create a backup of the original file(s)."),
+        backup: bool = typer.Option(
+        False, "--backup", "-b", help="Whether to create a backup of the original file(s).",
+    ),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Don't ask for confirmation.",),
+    raw_code: str = typer.Option(None, "--raw-code", "-c", help="Raw code to edit. Overrides filenames"),
+    json: bool = typer.Option(False, "--json", "-j", help="Output in JSON format"),
     ):
     """
-    Edit a file using codegpt's built in prompts
+    Edit a file using codegpt's built in prompts.
+
+    Arguments for `option`:
+    - comment - Adds or updates comments
+    - varnames - Makes variable names reasonable
+    - ugh - Do anything GPT can to make the code suck less (might break stuff...)
+    - docs - Generate (or update) docs, including README.md
+    - bugs - Comment in code where the bugs are if GPT sees them (iffy)
+    - vulns - Comment in code where the vulns are if GPT sees them (iffy)
     """
     if option not in prompts.prompts:
         raise typer.BadParameter(f"{option} is not a valid option. Must be one of {list(prompts.prompts.keys())}")
-    code = files.load_text(filenames)
-    result = gpt.send_iffy_edit(prompts.prompts[option], code)
+
+    if not filenames and not raw_code:
+        raise typer.BadParameter("Either FILENAMES or --raw-code (-c) must be provided.")
+
+    code = {"code": raw_code} if raw_code else files.load_text(filenames)
+    result = gpt.send_iffy_edit(prompts.prompts[option], code, yes=yes, clipboard=bool(raw_code))
+
+    if json:
+        return json.dumps(result, sort_keys=True, indent=4)
+
     files.write_text(result, backup)
-    typer.secho("done", color=typer.colors.BRIGHT_BLUE)
+    typer.secho("Done!", color=typer.colors.BRIGHT_BLUE)
 
 
-@app.command()
+@app.command("config")
 def config():
     """
     Configuration instructions for the OpenAI secret key for the codegpt CLI.
     """
     # check if the secret key is already set in the environment variables
     if "OPENAI_SECRET_KEY" in os.environ:
-        print("The OPENAI_SECRET_KEY is already set in the environment variables.")
-        return
+        typer.secho("OPENAI_SECRET_KEY is already set in the environment! You probably don't need this.", typer.colors.BRIGHT_BLUE)
     else:
         typer.confirm(
             """
