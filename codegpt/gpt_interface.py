@@ -52,9 +52,7 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
         > <the code to be output line 1>
         > <the code to be output, line n...>
         
-        You must include an explanation of what you did, and the code to be output, regardless of the format or file.
-        
-        OUTPUT:""")
+        You must include an explanation of what you did, and the code to be output, regardless of the format or file.""")
 
     else:
         full_prompt += dedent("""
@@ -71,9 +69,7 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
         > <code line 1>
         > <code line n...>
         
-        You must include the filename, an explanation of what you did, and the code for the file to be output, regardless of the format or file.
-        
-        OUTPUT:""")
+        You must include the filename, an explanation of what you did, and the code for the file to be output, regardless of the format or file.""")
 
     max_tokens = confirm_send(full_prompt, yes=yes, silent=clipboard)
 
@@ -92,6 +88,19 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
         print(response["choices"][0]["text"])
     return parsed[0] if clipboard else parsed
 
+def send_normal_completion(prompt, max_tokens=3000, yes=False):
+
+    max_tokens = confirm_send(prompt, max_tokens, yes=yes)
+
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=max_tokens,
+        n=1,
+        temperature=0.6,
+    )
+
+    return response["choices"][0]["text"].strip().strip("```").strip()
 
 
 if __name__ == "__main__":
