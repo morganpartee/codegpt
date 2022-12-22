@@ -1,5 +1,5 @@
 def parse_resp(response:dict):
-    resp = response["choices"][0]["text"].splitlines()
+    resp = response["choices"][0]["text"].strip().splitlines()
     
     # Initialize an empty list to hold the dictionaries
     out = []
@@ -34,5 +34,9 @@ def parse_resp(response:dict):
 
     # Add the final dictionary to the output list
     out.append(curr_dict)
+
+    # Backtop just in case this fails. Tests don't tend to use whole code, so it gets weird.
+    if 'code' not in out:
+        out = [{'code': response["choices"][0]["text"]}]
 
     return out

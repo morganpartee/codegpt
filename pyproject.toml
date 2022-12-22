@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "codegpt"
-version = "0.2.10"
+version = "0.2.15"
 license = "GPL-3.0-or-later"
 description = "A CLI tool for refactoring code using OpenAI's models"
 authors = ["John Partee"]
@@ -22,3 +22,23 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry.scripts]
 codegpt = "codegpt.main:app"
+
+[tool.pytest]
+addopts = "--capture=fd --cov=my_module"
+
+# Directory where cache files should be stored
+cache_dir = ".pytest_cache"
+
+# List of plugins to load
+plugins = ["pytest-cov"]
+
+# List of files or directories to ignore during testing
+norecursedirs = ["venv"]
+
+# List of markers to exclude from test discovery
+markers = ["not_ready: mark tests that are not yet ready to be run"]
+
+[tool.pytest.ini_options]
+pythonpath = ["codegpt"]
+testpaths = ["tests"]
+

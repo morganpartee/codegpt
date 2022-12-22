@@ -1,6 +1,6 @@
 # Codegpt
 
-## 0.2.10
+## 0.2.15
 
 A tool for using GPT just a little quicker. A nearly truly automated footgun. Learn how to revert with git before trying please.
 
@@ -27,10 +27,10 @@ Usage
 To try Codegpt, you can run the following command:
 
 ```bash
-codegpt do <instructions (quoted)> <filenames>
+codegpt do <instructions (quoted)> -f readme.md 
 ```
 
-It will prompt you for directions to follow, and it'll do whatever you want. Write new docs, add comments to code, just make sure to ask it to "edit" or "comment" or whatever so it knows to change files or not.
+It can do basically anything. Try handing in some files for context and telling it to generate something new - SQL queries, new features, documentation, whatever.
 
 Or use the quick command to do some neat stuff, like:
 
