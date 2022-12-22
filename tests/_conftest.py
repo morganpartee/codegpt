@@ -3,11 +3,6 @@ import sys
 from tqdm import tqdm
 
 
-import subprocess
-import sys
-from tqdm import tqdm
-
-
 def pytest_configure(config):
     print("Building project...")
     with tqdm(total=1, desc="Building project", file=sys.stdout) as pbar:

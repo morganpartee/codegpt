@@ -21,4 +21,24 @@ requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry.scripts]
-codegpt = "codegpt.main:app"
+codegpt = "src.main:app"
+
+[tool.pytest]
+addopts = "--capture=fd --cov=my_module"
+
+# Directory where cache files should be stored
+cache_dir = ".pytest_cache"
+
+# List of plugins to load
+plugins = ["pytest-cov"]
+
+# List of files or directories to ignore during testing
+norecursedirs = ["venv"]
+
+# List of markers to exclude from test discovery
+markers = ["not_ready: mark tests that are not yet ready to be run"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+

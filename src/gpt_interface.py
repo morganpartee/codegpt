@@ -3,7 +3,7 @@ import openai
 import typer
 from typing import Dict
 from textwrap import dedent
-from codegpt.parse import parse_resp
+from parse import parse_resp
 
 try:
     nltk.data.find('tokenizers/punkt')
@@ -11,13 +11,15 @@ except LookupError:
     typer.secho("Downloading punkt for nltk... Only once!", fg=typer.colors.GREEN, bold=True)
     nltk.download('punkt', quiet=True)
 
-def confirm_send(prompt, max_tokens=4000, yes=False):
+def confirm_send(prompt, max_tokens=4000, yes=False, silent=False):
     tokens = nltk.word_tokenize(prompt)
 
     #! Yeah this math is BS, closeish though...
     max_tokens = round(max_tokens - (7 / 4) * len(tokens))
 
-    if yes:
+    if silent:
+        pass
+    elif yes:
         typer.secho(f"This prompt is {len(tokens)}ish tokens, GPT-3 can return {max_tokens}ish.", color=typer.colors.GREEN)
     else:
         typer.confirm(
@@ -65,7 +67,7 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
         > <code line 1>
         > <code line n...>""")
 
-    max_tokens = confirm_send(full_prompt, yes=yes)
+    max_tokens = confirm_send(full_prompt, yes=yes, silent=clipboard)
 
     response = openai.Completion.create(
         engine="text-davinci-003",
@@ -75,8 +77,11 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
         temperature=0.5,
     )
     
-    parsed = parse_resp(response)
-    
+    try:
+        parsed = parse_resp(response)
+    except KeyError as e:
+        print("ERROR: Response was malformed. Might still be usable, but is likely missing an explanation. Printing >\n")
+        print(response["choices"][0]["text"])
     return parsed[0] if clipboard else parsed
 
 

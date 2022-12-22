@@ -1,13 +1,15 @@
 import os
 import typer
 import json
+import logging
 
-from codegpt import prompts
 
-from codegpt import gpt_interface as gpt
-from codegpt import files
+import gpt_interface as gpt
 
-from typing import List
+import prompts
+import files
+
+from typing import List, Optional
 from pathlib import Path
 
 app = typer.Typer(
@@ -22,10 +24,6 @@ def edit_file(
     instruction: str = typer.Argument(
         ...,
         help="Instruction to edit the file(s). Keep it short! Wrap with quotes.",
-    ),
-    filenames: List[Path] = typer.Argument(
-        ["#CLIPBOARD"],
-        help="List of filenames to edit. If not provided, will prompt for input.",
     ),
     backup: bool = typer.Option(
         False,
@@ -54,7 +52,8 @@ def edit_file(
         "-r",
         help="Output the raw 'code' from the response and exit the function.",
     ),
-):
+        filenames: Optional[List[Path]] = typer.Argument(None, help="File(s) to edit or for context."),
+    ):
     """
     Do something given some code for context. Asking for documents, queries, etc. should work okay. Edits are iffy, but work a lot of the time.
 
@@ -63,10 +62,13 @@ def edit_file(
     FILENAMES: list of filenames to edit. If not provided, will prompt for input.
     INSTRUCTION: the instruction to edit the file(s). Keep it short!
     """
+    
+    if raw_out or json_out:
+        logging.basicConfig(level=logging.CRITICAL)
 
     if not filenames and not raw_code:
         raise typer.BadParameter(
-            "Either filenames or --raw-code (-c) must be provided."
+            "Either --filenames (-f) or --raw-code (-c) must be provided."
         )
 
     code = {"code": raw_code} if raw_code else files.load_text(filenames)
@@ -77,10 +79,12 @@ def edit_file(
     result = gpt.send_iffy_edit(instruction, code, yes=yes, clipboard=bool(raw_code))
 
     if json_out:
-        return json.dumps(result, sort_keys=True, indent=4)
+        print(json.dumps(result, sort_keys=True, indent=4))
+        return
 
     if raw_out:
-        return 'result["code"]'
+        print(result['code'])
+        return
 
     files.write_text(result, backup)
     typer.secho("Done!", color=typer.colors.BRIGHT_BLUE)
@@ -89,9 +93,6 @@ def edit_file(
 @app.command("quick")
 def quick_edit_file(
     option: str = typer.Argument(..., help=f"{{{'|'.join(prompts.prompts.keys())}}}"),
-    filenames: List[str] = typer.Argument(
-        ..., help="Enter the filenames to edit, separated by spaces"
-    ),
     backup: bool = typer.Option(
         False,
         "--backup",
@@ -105,9 +106,21 @@ def quick_edit_file(
         help="Don't ask for confirmation.",
     ),
     raw_code: str = typer.Option(
-        None, "--raw-code", "-c", help="Raw code to edit. Overrides filenames"
+        None,
+        "--raw-code",
+        "-c",
+        help="Raw code to edit. Overrides filenames. Use quotes to wrap the code.",
     ),
-    json_out: bool = typer.Option(False, "--json", "-j", help="Output in JSON format"),
+    json_out: bool = typer.Option(
+        False, "--json-out", "-j", help="Output the response in raw json format."
+    ),
+    raw_out: bool = typer.Option(
+        False,
+        "--raw-out",
+        "-r",
+        help="Output the raw 'code' from the response and exit the function.",
+    ),
+    filenames: Optional[List[Path]] = typer.Argument(None, help="File(s) to edit or for context."),
 ):
     """
     Edit a file using codegpt's built in prompts.
@@ -124,7 +137,7 @@ def quick_edit_file(
         raise typer.BadParameter(
             f"{option} is not a valid option. Must be one of {list(prompts.prompts.keys())}"
         )
-
+    
     if not filenames and not raw_code:
         raise typer.BadParameter(
             "Either FILENAMES or --raw-code (-c) must be provided."
@@ -136,7 +149,12 @@ def quick_edit_file(
     )
 
     if json_out:
-        return json.dumps(result, sort_keys=True, indent=4)
+        print(json.dumps(result, sort_keys=True, indent=4))
+        return
+
+    if raw_out: 
+        print(result['code'])
+        return
 
     files.write_text(result, backup)
     typer.secho("Done!", color=typer.colors.BRIGHT_BLUE)
