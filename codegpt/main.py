@@ -3,6 +3,8 @@ import typer
 import json
 import logging
 
+import sys
+sys.path.append("../codegpt")
 
 from codegpt import gpt_interface as gpt
 
@@ -11,6 +13,9 @@ from codegpt import files
 
 from typing import List, Optional
 from pathlib import Path
+
+from rich.progress import track
+
 
 app = typer.Typer(
     no_args_is_help=True,
@@ -160,6 +165,34 @@ def quick_edit_file(
     typer.secho("Done!", color=typer.colors.BRIGHT_BLUE)
 
 
+@app.command("docs")
+def docs(
+    paths: List[Path] = typer.Argument(None, exists=True, dir_okay=True, file_okay=True),
+):
+    data = files.split_code_into_chunks(paths, 1800)
+    
+    typer.secho(f"Found {len(data)} files. Documenting...", color=typer.colors.BRIGHT_BLUE)
+        
+    for filename, chunk in track(data.items()):
+        try:
+            prompt = prompts.generate_review_instructions(filename, chunk)
+            result = gpt.send_normal_completion(prompt, 4000, True)
+
+            # Write the documentation for the current code chunk to a file
+            outname = f"./docs/{filename}.md"
+            # Create the '/docs' folder and any intermediate directories if they do not exist
+            Path(outname).parent.mkdir(parents=True, exist_ok=True)
+            
+            files.write_text([{'filename': outname, 'code': result}])
+            
+            # Print a message to confirm that the documentation has been written to the file
+            typer.secho(f"Wrote documentation for {filename} to {outname}", color=typer.colors.GREEN)
+        except Exception as e:
+            import traceback as tb
+            tb.print_exc()
+            typer.secho(f"Error: {e}", color=typer.colors.RED)
+    typer.secho("Done!")
+    
 @app.command("config")
 def config():
     """

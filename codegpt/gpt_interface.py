@@ -92,6 +92,19 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
         print(response["choices"][0]["text"])
     return parsed[0] if clipboard else parsed
 
+def send_normal_completion(prompt, max_tokens=3000, yes=False):
+
+    max_tokens = confirm_send(prompt, max_tokens, yes=yes)
+
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=max_tokens,
+        n=1,
+        temperature=0.6,
+    )
+
+    return response["choices"][0]["text"].strip().strip("```").strip()
 
 
 if __name__ == "__main__":
