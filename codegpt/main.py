@@ -7,24 +7,22 @@ from codegpt import prompts
 from codegpt import gpt_interface as gpt
 from codegpt import files
 
-from typing import List
+from typing import List, Optional
 from pathlib import Path
 
 app = typer.Typer(
     no_args_is_help=True,
 )
 
-app = typer.Typer()
-
 
 @app.command("do")
 def edit_file(
-    instruction: str = typer.Argument(
+    eat_my_butt: str = typer.Argument(
         ...,
         help="Instruction to edit the file(s). Keep it short! Wrap with quotes.",
     ),
-    filenames: List[Path] = typer.Argument(
-        ["#CLIPBOARD"],
+    filenames: Optional[List[Path]] = typer.Argument(
+        None,
         help="List of filenames to edit. If not provided, will prompt for input.",
     ),
     backup: bool = typer.Option(
@@ -89,9 +87,7 @@ def edit_file(
 @app.command("quick")
 def quick_edit_file(
     option: str = typer.Argument(..., help=f"{{{'|'.join(prompts.prompts.keys())}}}"),
-    filenames: List[str] = typer.Argument(
-        ..., help="Enter the filenames to edit, separated by spaces"
-    ),
+    filenames: Optional[List[Path]] = [],
     backup: bool = typer.Option(
         False,
         "--backup",
@@ -142,7 +138,7 @@ def quick_edit_file(
     typer.secho("Done!", color=typer.colors.BRIGHT_BLUE)
 
 
-@app.command("config")
+@app.command()
 def config():
     """
     Configuration instructions for the OpenAI secret key for the codegpt CLI.

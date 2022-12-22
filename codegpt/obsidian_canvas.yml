@@ -1,0 +1,97 @@
+CanvasColor:
+  type: string
+CanvasData:
+  type: object
+  properties:
+    nodes:
+      type: array
+      items:
+        $ref: "#/definitions/AllCanvasNodeData"
+    edges:
+      type: array
+      items:
+        $ref: "#/definitions/CanvasEdgeData"
+CanvasNodeData:
+  type: object
+  properties:
+    id:
+      type: string
+    x:
+      type: number
+    y:
+      type: number
+    width:
+      type: number
+    height:
+      type: number
+    color:
+      $ref: "#/definitions/CanvasColor"
+AllCanvasNodeData:
+  type: object
+  allOf:
+    - $ref: "#/definitions/CanvasFileData"
+    - $ref: "#/definitions/CanvasTextData"
+    - $ref: "#/definitions/CanvasLinkData"
+    - $ref: "#/definitions/CanvasGroupData"
+CanvasFileData:
+  type: object
+  properties:
+    type:
+      type: string
+      enum: [file]
+    file:
+      type: string
+    subpath:
+      type: string
+  allOf:
+    - $ref: "#/definitions/CanvasNodeData"
+CanvasTextData:
+  type: object
+  properties:
+    type:
+      type: string
+      enum: [text]
+    text:
+      type: string
+  allOf:
+    - $ref: "#/definitions/CanvasNodeData"
+CanvasLinkData:
+  type: object
+  properties:
+    type:
+      type: string
+      enum: [link]
+    url:
+      type: string
+  allOf:
+    - $ref: "#/definitions/CanvasNodeData"
+CanvasGroupData:
+  type: object
+  properties:
+    type:
+      type: string
+      enum: [group]
+    label:
+      type: string
+  allOf:
+    - $ref: "#/definitions/CanvasNodeData"
+NodeSide:
+  type: string
+  enum: [top, right, bottom, left]
+CanvasEdgeData:
+  type: object
+  properties:
+    id:
+      type: string
+    fromNode:
+      type: string
+    fromSide:
+      $ref: "#/definitions/NodeSide"
+    toNode:
+      type: string
+    toSide:
+      $ref: "#/definitions/NodeSide"
+    color:
+      $ref: "#/definitions/CanvasColor"
+    label:
+      type: string

@@ -1,5 +1,7 @@
-import re
-from codegpt.main import edit_file
+from codegpt.main import app
+from typer.testing import CliRunner
+
+runner = CliRunner()
 
 
 def test_edit_file_add_comment():
@@ -8,12 +10,18 @@ def test_edit_file_add_comment():
     raw_code = "def foo():\n    print('Hello, world!')"
 
     # Call the function being tested
-    result = edit_file(instruction, raw_code=raw_code, yes=True, raw_out=True)
+    # result = edit_file(instruction, raw_code=raw_code, yes=True, raw_out=True)
+    result = runner.invoke(
+        app,
+        ["do", f"'{instruction}'", "--raw_code", f"'{raw_code}'", "-y", "-r"],
+    )
+
+    print(result.stdout)
 
     # Use a regex to match the output of the function
-    assert "#" in result
-    assert "def foo():" in result
-    assert "print('Hello, world!')" in result
+    assert "#" in result.stdout
+    assert "def foo():" in result.stdout
+    assert "print('Hello, world!')" in result.stdout
 
 
 def test_edit_file_reverse_string():
@@ -44,3 +52,9 @@ def test_edit_file_convert_to_uppercase():
 
     # Verify that the function is behaving as expected
     assert len(result) >= len(expected_output)
+
+
+if __name__ == "__main__":
+    import pytest
+
+    pytest.main([__file__])
