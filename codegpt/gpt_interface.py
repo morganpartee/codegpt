@@ -44,28 +44,36 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
     if clipboard:
         full_prompt += dedent("""
         
-        Answer in the following format:
+        Answer in the following format, using '> ' to indent values:
         
         explanation:
         > <The changes that you made>
         code:
         > <the code to be output line 1>
-        > <the code to be output, line n...>""")
+        > <the code to be output, line n...>
+        
+        You must include an explanation of what you did, and the code to be output, regardless of the format or file.
+        
+        OUTPUT:""")
 
     else:
         full_prompt += dedent("""
 
-        You may only output complete files.
+        You may only send me complete files.
 
-        If you add or modify a file, return it in this exact format:
-
+        For each file, return one block in this format, using '> ' to indent values:
+        
         filename:
         > <the filename to be output>
         explanation:
         > <The changes that you made>
         code:
         > <code line 1>
-        > <code line n...>""")
+        > <code line n...>
+        
+        You must include the filename, an explanation of what you did, and the code for the file to be output, regardless of the format or file.
+        
+        OUTPUT:""")
 
     max_tokens = confirm_send(full_prompt, yes=yes, silent=clipboard)
 
