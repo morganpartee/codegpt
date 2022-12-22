@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "codegpt"
-version = "0.2.12"
+version = "0.2.13"
 license = "GPL-3.0-or-later"
 description = "A CLI tool for refactoring code using OpenAI's models"
 authors = ["John Partee"]
@@ -39,6 +39,6 @@ norecursedirs = ["venv"]
 markers = ["not_ready: mark tests that are not yet ready to be run"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["codegpt"]
 testpaths = ["tests"]
 
