@@ -88,7 +88,7 @@ def edit_file(
         return
 
     if raw_out:
-        print(result['code'])
+        print(result.get('code') or result)
         return
 
     files.write_text(result, backup)

@@ -52,9 +52,7 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
         > <the code to be output line 1>
         > <the code to be output, line n...>
         
-        You must include an explanation of what you did, and the code to be output, regardless of the format or file.
-        
-        OUTPUT:""")
+        You must include an explanation of what you did, and the code to be output, regardless of the format or file.""")
 
     else:
         full_prompt += dedent("""
@@ -71,9 +69,7 @@ def send_iffy_edit(prompt: str, code: Dict[str, str], clipboard: bool = False, y
         > <code line 1>
         > <code line n...>
         
-        You must include the filename, an explanation of what you did, and the code for the file to be output, regardless of the format or file.
-        
-        OUTPUT:""")
+        You must include the filename, an explanation of what you did, and the code for the file to be output, regardless of the format or file.""")
 
     max_tokens = confirm_send(full_prompt, yes=yes, silent=clipboard)
 
