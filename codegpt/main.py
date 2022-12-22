@@ -4,10 +4,10 @@ import json
 import logging
 
 
-import gpt_interface as gpt
+from codegpt import gpt_interface as gpt
 
-import prompts
-import files
+from codegpt import prompts
+from codegpt import files
 
 from typing import List, Optional
 from pathlib import Path

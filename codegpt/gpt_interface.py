@@ -3,7 +3,7 @@ import openai
 import typer
 from typing import Dict
 from textwrap import dedent
-from parse import parse_resp
+from codegpt.parse import parse_resp
 
 try:
     nltk.data.find('tokenizers/punkt')

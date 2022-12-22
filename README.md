@@ -1,6 +1,6 @@
 # Codegpt
 
-## 0.2.13
+## 0.2.15
 
 A tool for using GPT just a little quicker. A nearly truly automated footgun. Learn how to revert with git before trying please.
 
