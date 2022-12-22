@@ -1,6 +1,6 @@
 # Codegpt
 
-## 0.2.15
+## 0.3
 
 A tool for using GPT just a little quicker. A nearly truly automated footgun. Learn how to revert with git before trying please.
 
@@ -21,7 +21,19 @@ Windows users can also use `setx` like:
 
 from an admin console.
 
-## Be careful! But try this
+## Your first (safe) command
+
+One cool thing is generating documentation. GPT-3 has a token limit of 4000 for completions, so larger files will be chunked up.
+
+```bash
+codegpt docs <paths>
+```
+
+And it'll generate docs, one per file. This is great when you're coming into a codebase you've never seen before.
+
+## Unsafe Commands
+
+Everything else can modify files. Have someone hold your beer and try some of these (after you check it into git):
 
 Usage
 To try Codegpt, you can run the following command:
