@@ -87,3 +87,38 @@ def generate_review_instructions(filename, code):
     """
     )
     return instructions
+
+nl = '\n'
+
+def generate_mind_map_prompt(docs):
+    return dedent(f"""
+    Create a mindmap from the files below:
+
+    {nl.join([f'```md{nl+doc+nl}```]n' for doc in docs])}
+
+    1. Identify the relationships between the documents and any important bugs, vulnerabilities, or ideas that emerge in the summary documents.
+    2. For each file, create a 'file' node with the following information: id, x and y coordinates, width and height, type ('file'), and file name.
+    3. If the summary includes bugs, vulnerabilities, or ideas, create a 'text' node for each one and connect it to the relevant file node with an edge. In each 'text' node, set the type to 'text' and include the text of the bug, vulnerability, or idea as the value for the 'text' key.
+    4. Add a 'text' node to the 'file' node with a summary of the important parts of the file contents not yet covered, with a markdown header.
+    Use the following schema to send me the mindmap layout as YAML:
+
+    nodes:
+      - id: <arbitrary unique ID>
+        x: <x coordinate>
+        y: <y coordinate>
+        width: <node width>
+        height: <node height>
+        type: file/text
+        file: <node file name> (for file nodes only)
+        text: <node text> (for text nodes only)
+    edges:
+      - id: <edge ID>
+        fromNode: <ID of node the edge starts from>
+        fromSide: <side of starting node that the
+        toNode: <ID of node the edge ends at>
+        toSide: <side of ending node that the edge is connected to>
+
+    Remember, the goal is to create a mindmap that represents the relationships between the documents,
+    and the problems and improvements we can make with them to guide us.
+
+    Use the nodes and edges to show how it is all connected.""")
