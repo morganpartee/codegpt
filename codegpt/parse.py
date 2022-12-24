@@ -1,4 +1,4 @@
-def parse_resp(response:dict):
+def parse_resp(response: dict):
     resp = response["choices"][0]["text"].strip().splitlines()
 
     # Initialize an empty list to hold the dictionaries
@@ -15,13 +15,13 @@ def parse_resp(response:dict):
             continue
 
         # If the line doesn't start with '>', it's a key
-        if line[0] != '>':
+        if line[0] != ">":
             # Strip leading/trailing whitespace and remove ':' from the key
-            key = line.strip().replace(":", '').lower()
+            key = line.strip().replace(":", "").lower()
             # Initialize an empty value for this key in the current dictionary
             curr_dict[key] = ""
         else:
-            curr_dict[key] += line.strip().strip('> ').strip('>') + '\n'
+            curr_dict[key] += line.strip("> ").strip(">") + "\n"
 
     # Add the final dictionary to the output list
     out.append(curr_dict)

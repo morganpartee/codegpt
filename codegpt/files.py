@@ -17,7 +17,7 @@ def write_text(files, backup=False):
     # If the backup option is specified and the file exists,
     # write the existing file to <filename>.bak
     for i, out in enumerate(files):
-        filename = out.get("filename", f"{i}.txt")
+        filename = out.get("filename", f"{i}.txt").strip()
         if backup and os.path.exists(filename):
             with open(filename, "r") as f_in:
                 with open(f"{filename}.bak", "w") as f_out:
@@ -28,7 +28,7 @@ def write_text(files, backup=False):
             f.write(out["code"])
         if "explanation" in out:
             typer.secho(f"{filename} - " + out["explanation"], color=typer.colors.BLUE)
-        
+
 
 def split_code_into_chunks(paths, chunk_size):
     chunks = {}
@@ -44,6 +44,7 @@ def split_code_into_chunks(paths, chunk_size):
             process_file(path, chunk_size, chunks)
 
     return chunks
+
 
 def process_file(file_path, chunk_size, chunks):
     # Use the python-magic library to identify the type of the file

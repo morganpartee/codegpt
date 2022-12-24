@@ -4,6 +4,7 @@ import json
 import logging
 
 import sys
+
 sys.path.append("../codegpt")
 
 from codegpt import gpt_interface as gpt
@@ -20,8 +21,6 @@ from rich.progress import track
 app = typer.Typer(
     no_args_is_help=True,
 )
-
-app = typer.Typer()
 
 
 @app.command("do")
@@ -57,8 +56,10 @@ def edit_file(
         "-r",
         help="Output the raw 'code' from the response and exit the function.",
     ),
-        filenames: Optional[List[Path]] = typer.Argument(None, help="File(s) to edit or for context."),
-    ):
+    filenames: Optional[List[Path]] = typer.Argument(
+        None, help="File(s) to edit or for context."
+    ),
+):
     """
     Do something given some code for context. Asking for documents, queries, etc. should work okay. Edits are iffy, but work a lot of the time.
 
@@ -67,7 +68,7 @@ def edit_file(
     FILENAMES: list of filenames to edit. If not provided, will prompt for input.
     INSTRUCTION: the instruction to edit the file(s). Keep it short!
     """
-    
+
     if raw_out or json_out:
         logging.basicConfig(level=logging.CRITICAL)
 
@@ -88,7 +89,7 @@ def edit_file(
         return
 
     if raw_out:
-        print(result.get('code') or result)
+        print(result.get("code") or result)
         return
 
     files.write_text(result, backup)
@@ -125,7 +126,9 @@ def quick_edit_file(
         "-r",
         help="Output the raw 'code' from the response and exit the function.",
     ),
-    filenames: Optional[List[Path]] = typer.Argument(None, help="File(s) to edit or for context."),
+    filenames: Optional[List[Path]] = typer.Argument(
+        None, help="File(s) to edit or for context."
+    ),
 ):
     """
     Edit a file using codegpt's built in prompts.
@@ -142,7 +145,7 @@ def quick_edit_file(
         raise typer.BadParameter(
             f"{option} is not a valid option. Must be one of {list(prompts.prompts.keys())}"
         )
-    
+
     if not filenames and not raw_code:
         raise typer.BadParameter(
             "Either FILENAMES or --raw-code (-c) must be provided."
@@ -157,8 +160,8 @@ def quick_edit_file(
         print(json.dumps(result, sort_keys=True, indent=4))
         return
 
-    if raw_out: 
-        print(result['code'])
+    if raw_out:
+        print(result["code"])
         return
 
     files.write_text(result, backup)
@@ -167,12 +170,16 @@ def quick_edit_file(
 
 @app.command("docs")
 def docs(
-    paths: List[Path] = typer.Argument(None, exists=True, dir_okay=True, file_okay=True),
+    paths: List[Path] = typer.Argument(
+        None, exists=True, dir_okay=True, file_okay=True
+    ),
 ):
     data = files.split_code_into_chunks(paths, 1800)
-    
-    typer.secho(f"Found {len(data)} files. Documenting...", color=typer.colors.BRIGHT_BLUE)
-        
+
+    typer.secho(
+        f"Found {len(data)} files. Documenting...", color=typer.colors.BRIGHT_BLUE
+    )
+
     for filename, chunk in track(data.items()):
         try:
             prompt = prompts.generate_review_instructions(filename, chunk)
@@ -182,17 +189,22 @@ def docs(
             outname = f"./docs/{filename}.md"
             # Create the '/docs' folder and any intermediate directories if they do not exist
             Path(outname).parent.mkdir(parents=True, exist_ok=True)
-            
-            files.write_text([{'filename': outname, 'code': result}])
-            
+
+            files.write_text([{"filename": outname, "code": result}])
+
             # Print a message to confirm that the documentation has been written to the file
-            typer.secho(f"Wrote documentation for {filename} to {outname}", color=typer.colors.GREEN)
+            typer.secho(
+                f"Wrote documentation for {filename} to {outname}",
+                color=typer.colors.GREEN,
+            )
         except Exception as e:
             import traceback as tb
+
             tb.print_exc()
             typer.secho(f"Error: {e}", color=typer.colors.RED)
     typer.secho("Done!")
-    
+
+
 @app.command("config")
 def config():
     """
