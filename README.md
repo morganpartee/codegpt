@@ -8,6 +8,8 @@ Posting about progress here:
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/_JohnPartee?style=social)](https://twitter.com/_JohnPartee)
 
+[More GPT Notes here](https://github.com/morganpartee/gpt3-resources)
+
 ## Getting Started
 
 `pip install codegpt --upgrade`
