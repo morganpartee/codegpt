@@ -45,7 +45,7 @@ def _refactor_or_edit(
     max_tokens = (round(4097 - (7 / 4) * len(tokens)),)
 
     typer.confirm(
-        f"This prompt is {len(tokens)} tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {max_tokens}.",
+        f"This prompt is {tokens if type(tokens) == int else len(tokens)} tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {max_tokens}.",
         default=True,
         abort=True,
     )

@@ -54,7 +54,7 @@ def refactor(
     tokens = nltk.word_tokenize(prompt)
 
     typer.confirm(
-        f"This prompt is {len(tokens)} tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {4097 - len(tokens)}.",
+        f"This prompt is {tokens if type(tokens) == int else len(tokens)} tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {4097 - len(tokens)}.",
         default=True,
         abort=True,
     )
@@ -133,7 +133,7 @@ def edit(
     tokens = nltk.word_tokenize(prompt)
 
     typer.confirm(
-        f"This prompt is {len(tokens)} tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {4097 - len(tokens)}.",
+        f"This prompt is {tokens if type(tokens) == int else len(tokens)} tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {4097 - len(tokens)}.",
         abort=True,
         default=True,
     )
