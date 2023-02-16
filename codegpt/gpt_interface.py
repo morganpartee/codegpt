@@ -20,7 +20,7 @@ def confirm_send(prompt: str, max_tokens=4000, yes=False, silent=False):
         )
     else:
         typer.confirm(
-            f"This prompt is {len(tokens)}ish tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {max_tokens}ish.",
+            f"This prompt is {tokens if type(tokens) == int else len(tokens)}ish tokens, are you sure you want to continue?\nThe most GPT-3 can return in response is {max_tokens}ish.",
             default=True,
             abort=True,
         )
